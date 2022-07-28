@@ -1,4 +1,4 @@
-# quizzler
+# Quizzler
 
 A new Flutter project.
 
