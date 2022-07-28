@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:quizzler/questions.dart';
+import 'package:quizzler/quiz_brain.dart';
 
 void main() {
   runApp(const Quizzler());
@@ -37,28 +38,13 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scoreKeeper = [];
-  List<Question> questions = [
-    Question(
-        question: 'You can lead a cow down stairs but not up stairs.',
-        answer: false),
-    Question(
-        question: 'Approximately one quarter of human bones are in the feet.',
-        answer: true),
-    Question(question: 'A slug\'s blood is green.', answer: true),
-  ];
+  var quizBrain = QuizBrain();
 
-  var questionNumber = Random().nextInt(3);
   var windowWidth = 0.0;
   void checkAnswer(bool userPickedAnswer) {
-    bool correctAnswer =
-        questions[questionNumber].answer; //quizBrain.getCorrectAnswer();
+    bool correctAnswer = quizBrain.getCorrectAnswer();
 
     setState(() {
-      var temp = Random().nextInt(questions.length);
-
-      // Avoid recurrance of same question
-      questionNumber =
-          (temp == questionNumber) ? (temp + 1) % questions.length : temp;
       windowWidth = MediaQuery.of(context).size.width;
       if (scoreKeeper.length >= windowWidth / 27) scoreKeeper.clear();
 
@@ -96,7 +82,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: const EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                questions[questionNumber].question,
+                quizBrain.nextQuestion(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 25.0,
@@ -156,9 +142,3 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 }
-
-/*
-question1: 'You can lead a cow down stairs but not up stairs.', false,
-question2: 'Approximately one quarter of human bones are in the feet.', true,
-question3: 'A slug\'s blood is green.', true,
-*/
