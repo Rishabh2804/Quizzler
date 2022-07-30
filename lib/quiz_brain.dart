@@ -4,17 +4,16 @@ import 'package:quizzler/questions.dart';
 
 class QuizBrain {
   int questionsCount = 0;
+  int questionsLeft = 0;
   int questionNumber = 0;
 
+  QuizBrain() {
+    questionsCount = _questionBank.length;
+    questionsLeft = questionsCount;
+    questionNumber = Random().nextInt(questionsLeft);
+  }
+
   final List<Question> _questionBank = [
-    Question(
-      question: 'You can lead a cow down stairs but not up stairs.',
-      answer: false,
-    ),
-    Question(
-      question: 'Approximately one quarter of human bones are in the feet.',
-      answer: true,
-    ),
     Question(
       question: 'A slug\'s blood is green.',
       answer: true,
@@ -28,10 +27,6 @@ class QuizBrain {
         answer: false),
     Question(
       question: 'Approximately one quarter of human bones are in the feet.',
-      answer: true,
-    ),
-    Question(
-      question: 'A slug\'s blood is green.',
       answer: true,
     ),
     Question(
@@ -78,28 +73,35 @@ class QuizBrain {
     ),
   ];
 
-  int getQuestionCount() {
-    return _questionBank.length;
+  void reset() {
+    questionsLeft = questionsCount;
+    questionNumber = Random().nextInt(questionsLeft);
   }
 
-  String nextQuestion() {
-    var temp = Random().nextInt(getQuestionCount());
+  int getQuestionCount() => _questionBank.length;
 
-    // Avoid recurrance of same question
-    questionNumber =
-        (temp == questionNumber) ? (temp + 1) % getQuestionCount() : temp;
+  String nextQuestion() =>
+      _questionBank[questionNumber = Random().nextInt(questionsLeft)].question;
 
-    return _questionBank[questionNumber].question;
+  void markAnswered() {
+    var currQuestion = _questionBank[questionNumber];
+    currQuestion.isAnswered = true;
+
+    // Shift the last question answered at end of the list
+    // so that it won't be chosen again.
+    _questionBank.removeAt(questionNumber);
+    _questionBank.add(currQuestion);
+
+    questionsLeft--;
   }
 
-  bool getCorrectAnswer() {
-    return _questionBank[questionNumber].answer;
-  }
+  bool getCorrectAnswer() => _questionBank[questionNumber].answer;
 
-  void addQuestion({required String question, required bool answer}) {
-    _questionBank.add(Question(
-      question: question,
-      answer: answer,
-    ));
-  }
+  bool isFinished() => questionsLeft == 1;
+
+  void addQuestion({required String question, required bool answer}) =>
+      _questionBank.add(Question(
+        question: question,
+        answer: answer,
+      ));
 }

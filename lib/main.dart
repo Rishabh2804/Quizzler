@@ -1,9 +1,6 @@
-import 'dart:math';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:quizzler/questions.dart';
 import 'package:quizzler/quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() {
   runApp(const Quizzler());
@@ -38,7 +35,9 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scoreKeeper = [];
+
   var quizBrain = QuizBrain();
+  var correct = 0;
 
   var windowWidth = 0.0;
   void checkAnswer(bool userPickedAnswer) {
@@ -48,14 +47,8 @@ class _QuizPageState extends State<QuizPage> {
       windowWidth = MediaQuery.of(context).size.width;
       if (scoreKeeper.length >= windowWidth / 27) scoreKeeper.clear();
 
-      //TODO: Step 4 - Use IF/ELSE to check if we've reached the end of the quiz. If true, execute Part A, B, C, D.
-      //TODO: Step 4 Part A - show an alert using rFlutter_alert (remember to read the docs for the package!)
-      //HINT! Step 4 Part B is in the quiz_brain.dart
-      //TODO: Step 4 Part C - reset the questionNumber,
-      //TODO: Step 4 Part D - empty out the scoreKeeper.
-
-      //TODO: Step 5 - If we've not reached the end, ELSE do the answer checking steps below 👇
       if (userPickedAnswer == correctAnswer) {
+        correct++;
         scoreKeeper.add(const Icon(
           Icons.check,
           color: Colors.green,
@@ -66,7 +59,12 @@ class _QuizPageState extends State<QuizPage> {
           color: Colors.red,
         ));
       }
-      // quizBrain.nextQuestion();
+
+      if (quizBrain.isFinished()) {
+        showAlert();
+        resetGame();
+      }
+      quizBrain.markAnswered();
     });
   }
 
@@ -140,5 +138,20 @@ class _QuizPageState extends State<QuizPage> {
         )
       ],
     );
+  }
+
+  void showAlert() {
+    Alert(
+      context: context,
+      title: 'Quizzler Over!',
+      desc: 'Congratulations! You have finished the Quiz!\n'
+          'Your score is $correct out of ${quizBrain.getQuestionCount()}',
+    ).show();
+  }
+
+  void resetGame() {
+    quizBrain.reset();
+    scoreKeeper = [];
+    correct = 0;
   }
 }
